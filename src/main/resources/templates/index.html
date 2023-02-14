@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Everything To Png</title>
+    <style>
+        body {
+            font-size: 20px;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        label {
+            margin: 10px;
+        }
+
+        #image-preview, #converted-image {
+            margin: 20px;
+        }
+
+        #file-upload, #convert-btn, #download-btn {
+            margin: 10px;
+        }
+
+
+    </style>
+</head>
+<body>
+<!-- Bouton pour télécharger l'image -->
+<label for="file-upload">Télécharger une image:</label>
+<input type="file" id="file-upload" onchange="previewImage()">
+
+<!-- Div pour afficher l'image téléchargée -->
+<div id="image-preview"></div>
+
+<!-- Bouton pour convertir l'image en PNG -->
+<button id="convert-btn" disabled onclick="convertToPng()">Convertir en PNG</button>
+
+<!-- Div pour afficher l'image convertie -->
+<div id="converted-image"></div>
+
+<!-- Bouton pour télécharger l'image convertie -->
+<a id="download-link" download hidden>Télécharger l'image convertie</a>
+<button id="download-btn" disabled onclick="downloadConverted()">Télécharger l'image convertie</button>
+
+<script>
+    let input = document.getElementById('file-upload');
+    let preview = document.getElementById('image-preview');
+    let convertBtn = document.getElementById('convert-btn');
+    let convertedImage = document.getElementById('converted-image');
+    let downloadLink = document.getElementById('download-link');
+    let downloadBtn = document.getElementById('download-btn');
+    let file;
+
+    function previewImage() {
+        file = input.files[0];
+        let reader = new FileReader();
+        reader.onload = function() {
+            preview.innerHTML = '';
+            let img = new Image();
+            img.src = reader.result;
+            preview.appendChild(img);
+            convertBtn.disabled = false;
+        }
+        reader.readAsDataURL(file);
+    }
+
+    function convertToPng() {
+        let img = new Image();
+        img.onload = function() {
+            let canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            let ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            let dataURL = canvas.toDataURL('image/png');
+            convertedImage.innerHTML = '';
+            let newImg = new Image();
+            newImg.src = dataURL;
+            convertedImage.appendChild(newImg);
+            downloadLink.href = dataURL;
+            downloadLink.download = file.name.replace(/\.[^/.]+$/, "") + '.png';
+            downloadBtn.disabled = false;
+        };
+        img.src = URL.createObjectURL(file);
+    }
+
+    function downloadConverted() {
+        downloadLink.click();
+    }
+
+</script>
+
+</body>
+</html>
